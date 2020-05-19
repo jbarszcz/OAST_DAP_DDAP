@@ -1,7 +1,7 @@
 from net.NetParser import NetParser
 import BruteForceAlgorithm
 
-NET_FILE_NAME = "input_files/net4.txt"
+NET_FILE_NAME = "input_files/net_test.txt"
 
 if __name__ == "__main__":
     net_parser = NetParser()
@@ -11,6 +11,6 @@ if __name__ == "__main__":
     demand1 = net.get_demand(1)
 
     #combinations = BruteForceAlgorithm.get_all_combinations_for_demand(demand1)
-    solutions = BruteForceAlgorithm.get_solutions(net)
+    solutions = BruteForceAlgorithm.compute(net)
     print("hello")
 

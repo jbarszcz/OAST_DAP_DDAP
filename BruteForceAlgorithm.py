@@ -1,75 +1,78 @@
 import math
 import itertools
-from net.Point import Point
+from net.Flow import Flow
 import collections
+import sys
+
+
+def compute(net):
+    demands = net.demands
+    solutions = get_solutions(demands)
+    calculate_link_capacities(net, solutions)
+
+
+def calculate_link_capacities(net, solutions):
+    links = net.links
+    capacities = [0] * len(net.links)
+    paths = list(itertools.chain.from_iterable([demand.demand_paths for demand in net.demands]))  # do refactoru
+
+    for i, link in enumerate(links):
+        flow_sum = 0.0
+        for j, demand_path in paths:
+            pass
 
 
 def get_all_combinations_for_demand(demand):
-    # number_of_combinations_for_one_demand = math.comb(demand.get_number_of_paths() + demand.volume - 1,
-    #                                                   demand.get_number_of_paths() - 1)
     _list = range(demand.volume + 1)
     lists = [_list for i in range(demand.get_number_of_paths())]
-    solutions = []
 
-    combinations = [combination for combination in itertools.product(*lists) if sum(combination) == demand.volume]
-    for combination in combinations:
-        map_values_of_one_demand = {}
-        for demand_path in demand.demand_paths:
-            path_id = demand_path.path_id
-            map_values_of_one_demand[Point(demand.id, path_id)] = combination[path_id - 1]
-        solutions.append(Solution(map_values_of_one_demand))
+    volume_split_combinations = [combination for combination in itertools.product(*lists) if
+                                 sum(combination) == demand.volume]
+
+    solutions = [Solution(create_flow_value_mapping(combination, demand)) for combination in volume_split_combinations]
     return solutions
 
 
-def get_solutions(net):
-    all_combinations_all_demands = [get_all_combinations_for_demand(demand) for demand in net.demands]
-    indexes = [range(len(combination)) for combination in all_combinations_all_demands]
-    combinations_indexes = list(itertools.product(*indexes))
+def create_flow_value_mapping(combination, demand):
+    flow_volume_mappings = {}  # kolumna_tabeli
+    for demand_path in demand.demand_paths:
+        path_id = demand_path.path_id
+        flow_xdp = (demand.id, path_id)
+        flow_volume_mappings[flow_xdp] = combination[path_id - 1]
+    return flow_volume_mappings
 
-    print("hello")
+
+def get_solutions(demands):
+    # dla kazdego demandu jak moga sie rozkladac przeplywy
+    all_combinations_all_demands = [get_all_combinations_for_demand(demand) for demand in demands]
+
+    # blizniacza lista do powyzszej - kazdy rozklad przeplywow w demandzie otrzymuje swoj indeks
+    indexes = [range(len(combination)) for combination in all_combinations_all_demands]
+
+    # iloczyn kartezjanski - wszystkie kombinacje wszystkich rozkladlow dla kazdego demandu (10*15*6*6*10*15). Na ostatniej pozycji wartosci sa od 0 do 14, bo demand 6 ma 14 roznych kombinacji
+    solution_indexes = list(itertools.product(*indexes))
+
+    number_of_solutions = len(solution_indexes)
+    solutions = [get_solution(all_combinations_all_demands, i, solution_indexes) for i in range(number_of_solutions)]
+
+    return solutions
+
+
+# use: for idx, val in enumerate(ints): print(idx, val)
+def get_solution(all_combinations_all_demands, i, solution_indexes):
+    print(i)
+    new_complete_solution = Solution({})
+    current_solution = solution_indexes[i]
+    for demand_index in range(len(current_solution)):  # to zawsze bedzie 6 dla net4 bo jest 6 demandow
+        combination_index = current_solution[demand_index]
+        solution_mapping = all_combinations_all_demands[demand_index][combination_index]
+        new_complete_solution.add_mappings(solution_mapping.flow_volume_mappings)
+    return new_complete_solution
 
 
 class Solution(object):
-    # def __init__(self, cost: float, values: []):
-    #     self.cost = cost
-    #     self.values = values
+    def __init__(self, flow_volume_mappings: dict):
+        self.flow_volume_mappings = flow_volume_mappings  # slownik mapujacy tuple (demand_id, path_id) na volume jaki jest przydzialony
 
-    def __init__(self, map_values):
-        self.map_values = map_values
-
-    # def compare(self, other):
-    #     if other.cost < self.cost:
-    #         return other
-    #     elif other.cost == self.cost:
-    #         self.append(other.values[0])
-    #         return self
-    #     else:
-    #         return self
-    #
-    # def append(self, new_solution: []):
-    #     self.values.append(new_solution)
-
-    # def print(self, network: Network, solve_number: int):
-    #
-    #     row_format = "{:<7}" + "{:^5}" * network.number_of_demands
-    #     demand_list = ["[%s]" % x for x in range(1, network.number_of_demands + 1)]
-    #     path_list = ["[%s]" % x for x in range(1, network.longest_demand_path + 1)]
-    #     transposed_data = zip(*self.values[solve_number])
-    #
-    #     print('Routes: \\ Demands:')
-    #     print(row_format.format("", *demand_list))
-    #     for path_id, row in enumerate(transposed_data):
-    #         print(row_format.format(path_list[path_id], *row))
-    #     print(row_format.format("h(d):",
-    #                             *[network.demands_list[x].demand_volume for x in range(len(network.demands_list))]))
-    #     print("Solution cost: {}".format(self.cost))
-    #     print("Is solution valid: {}".format(self.validate(network, solve_number)))
-    #     print()
-    #
-    # def validate(self, network: Network, solve_number: int):
-    #     valid = True
-    #     for demand in range(len(self.values[solve_number])):
-    #         demand_passed = sum(self.values[solve_number][demand])
-    #         valid = valid and (demand_passed >= network.demands_list[demand].demand_volume)
-    #
-    #     return valid
+    def add_mappings(self, new_mappings: dict):
+        self.flow_volume_mappings = {**self.flow_volume_mappings, **new_mappings}
