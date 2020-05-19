@@ -1,7 +1,7 @@
 from net.NetParser import NetParser
 import BruteForceAlgorithm
 
-NET_FILE_NAME = "input_files/net_test.txt"
+NET_FILE_NAME = "input_files/net4.txt"
 
 if __name__ == "__main__":
     net_parser = NetParser()

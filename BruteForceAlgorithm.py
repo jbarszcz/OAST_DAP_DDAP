@@ -15,11 +15,11 @@ def calculate_link_capacities(net, solutions):
     links = net.links
     capacities = [0] * len(net.links)
     paths = list(itertools.chain.from_iterable([demand.demand_paths for demand in net.demands]))  # do refactoru
-
-    for i, link in enumerate(links):
-        flow_sum = 0.0
-        for j, demand_path in paths:
-            pass
+    #
+    # for i, link in enumerate(links):
+    #     flow_sum = 0.0
+    #     for j, demand_path in paths:
+    #         pass
 
 
 def get_all_combinations_for_demand(demand):
@@ -52,22 +52,22 @@ def get_solutions(demands):
     # iloczyn kartezjanski - wszystkie kombinacje wszystkich rozkladlow dla kazdego demandu (10*15*6*6*10*15). Na ostatniej pozycji wartosci sa od 0 do 14, bo demand 6 ma 14 roznych kombinacji
     solution_indexes = list(itertools.product(*indexes))
 
-    number_of_solutions = len(solution_indexes)
-    solutions = [get_solution(all_combinations_all_demands, i, solution_indexes) for i in range(number_of_solutions)]
-
+    solutions = [get_solution(all_combinations_all_demands, demand_index, current_solution) for
+                 demand_index, current_solution in enumerate(solution_indexes)]
     return solutions
 
+def get_solution(demand_combination_matrix, demand_index, current_solution):
+    print(demand_index)
+    mapping = {}
+    for demand_index, combination_index in enumerate(
+            current_solution):  # to zawsze bedzie 6 dla net4 bo jest 6 demandow
+        solution_mapping = demand_combination_matrix[demand_index][combination_index]
+        mapping = _add_mappings(mapping, solution_mapping.flow_volume_mappings)
+    return Solution(mapping)
 
-# use: for idx, val in enumerate(ints): print(idx, val)
-def get_solution(all_combinations_all_demands, i, solution_indexes):
-    print(i)
-    new_complete_solution = Solution({})
-    current_solution = solution_indexes[i]
-    for demand_index in range(len(current_solution)):  # to zawsze bedzie 6 dla net4 bo jest 6 demandow
-        combination_index = current_solution[demand_index]
-        solution_mapping = all_combinations_all_demands[demand_index][combination_index]
-        new_complete_solution.add_mappings(solution_mapping.flow_volume_mappings)
-    return new_complete_solution
+
+def _add_mappings(old: dict, new: dict):
+    return {**old, **new}
 
 
 class Solution(object):
