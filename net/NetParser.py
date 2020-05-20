@@ -9,10 +9,10 @@ class NetParser:
         pass
 
     @staticmethod
-    def parse_line(raw_line):
+    def parse_line(raw_line: str):
         return raw_line.strip().split(" ")
 
-    def parse_file(self, file_name):
+    def parse_file(self, file_name: str):
         net = Net()
         with open(file_name) as net_file:
             # links
@@ -29,14 +29,14 @@ class NetParser:
             number_of_demands = int(net_file.readline())
             net_file.readline()  # blank line
 
-            for i in range(number_of_demands):
+            for demand_number in range(number_of_demands):
                 demand_data = self.parse_line(net_file.readline())
-                demand = Demand(data=demand_data, demand_id=i + 1)
+                demand = Demand(data=demand_data, demand_id=demand_number + 1)
                 number_of_demand_paths = int(net_file.readline())
 
-                for _ in range(number_of_demand_paths):
+                for demand_path_number in range(number_of_demand_paths):
                     demand_path_data = self.parse_line(net_file.readline())
-                    demand_path = DemandPath(data=demand_path_data)
+                    demand_path = DemandPath(data=demand_path_data, demand_id=demand_number + 1)
                     demand.demand_paths.append(demand_path)
 
                 net.demands.append(demand)

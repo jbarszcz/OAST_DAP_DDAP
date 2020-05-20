@@ -1,5 +1,5 @@
 from net.NetParser import NetParser
-import BruteForceAlgorithm
+from algorithms import BruteForceAlgorithm
 
 NET_FILE_NAME = "input_files/net4.txt"
 
@@ -7,10 +7,4 @@ if __name__ == "__main__":
     net_parser = NetParser()
     net = net_parser.parse_file(NET_FILE_NAME)
 
-
-    demand1 = net.get_demand(1)
-
-    #combinations = BruteForceAlgorithm.get_all_combinations_for_demand(demand1)
-    solutions = BruteForceAlgorithm.compute(net)
-    print("hello")
-
+    solutions = BruteForceAlgorithm.compute(net, problem="DDAP")
