@@ -5,7 +5,7 @@ from typing import List
 from itertools import product
 
 
-def compute(net: Net, problem):
+def compute(net: Net, problem: str):
     demands = net.demands
     solutions = get_all_solutions(demands)
     print("calculating link capacities...")
@@ -15,35 +15,42 @@ def compute(net: Net, problem):
     if problem == "DDAP":
         print("solving ddap with bruteforce method...")
         ddap_solution = ddap(solutions, net)
-        print(ddap_solution.flow_volume_mappings)
-        print(ddap_solution.link_capacities)
+        print(ddap_solution)
 
     if problem == "DAP":
         dap_solution = dap(solutions, net)
+        print(dap_solution) if dap_solution else print("Couldn't solve the DAP problem.")
 
 
 def ddap(solutions: List[Solution], net: Net) -> Solution:
+    print("current best cost is: ", end="")
     best_cost = float("inf")
     best_solution = None
     for solution in solutions:
         cost = 0
-        link_costs = solution.link_capacities
+        link_costs = solution.link_loads
         for link_id, link_cost in enumerate(link_costs):
             cost += net.links[link_id].unit_cost * link_costs[link_id]
         if cost < best_cost:
             best_cost = cost
             best_solution = solution
-            print(f"  new best cost found: {best_cost}")
+            print(f" {best_cost}", end="")
+    print("\n-------")
     print(f"final best cost: {best_cost}")
     return best_solution
 
 
-def dap(solutions: List[Solution], net: Net) -> Solution:
-    # exceeded_capacity = int("inf")
-    # for solution in solutions:
-    pass
-
-
+def dap(solutions: List[Solution], net: Net):
+    for solution in solutions:
+        finished = True
+        for i, link_load in enumerate(solution.link_loads):
+            # odejmujemy obciazenie od pojemnosci lacza
+            if min(0, net.links[i].number_of_modules - link_load) < 0:
+                finished = False
+                break  # pojemnosc przekroczona
+        if finished:
+            return solution
+    return None
 
 
 def get_solutions_for_one_demand(demand: Demand) -> List[Solution]:  # get all flow combinations for one demand
@@ -57,7 +64,7 @@ def get_solutions_for_one_demand(demand: Demand) -> List[Solution]:  # get all f
     return solutions
 
 
-def create_flow_value_mapping(combination, demand: Demand):
+def create_flow_value_mapping(combination: tuple, demand: Demand):
     flow_volume_mappings = {}  # kolumna_tabeli
     for demand_path in demand.demand_paths:
         path_id = demand_path.path_id
@@ -79,13 +86,13 @@ def get_all_solutions(demands: List[Demand]) -> List[Solution]:  # get all combi
     solution_indexes = list(product(*indexes))
 
     print("generating all possible solutions... ", end="")
-    solutions = [get_solution(all_combinations_all_demands, demand_index, current_solution) for
-                 demand_index, current_solution in enumerate(solution_indexes)]
+    solutions = [get_complete_solution(all_combinations_all_demands, current_solution_index) for current_solution_index
+                 in solution_indexes]
     print(f"{len(solutions)} found.")
     return solutions
 
 
-def get_solution(demand_combination_matrix, demand_index, current_solution) -> Solution:
+def get_complete_solution(demand_combination_matrix: List[List[Solution]], current_solution: tuple) -> Solution:
     mapping = {}
     for demand_index, combination_index in enumerate(
             current_solution):  # to zawsze bedzie 6 dla net4 bo jest 6 demandow

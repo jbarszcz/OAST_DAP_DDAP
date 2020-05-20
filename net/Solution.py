@@ -1,12 +1,13 @@
 from net import Net
 import math
+from pprint import pformat
 
 
 class Solution(object):
     def __init__(self, flow_volume_mappings: dict):
         # slownik mapujacy tuple (demand_id, path_id) na volume jaki jest przydzialony
         self.flow_volume_mappings = flow_volume_mappings
-        self.link_capacities = []
+        self.link_loads = []
         self.number_of_links_with_exceeded_capacity = 0
 
     def add_mappings(self, new_mappings: dict):
@@ -24,5 +25,10 @@ class Solution(object):
                     volume_sum += volume
             capacities[link_id] = math.ceil(volume_sum / link.module)
 
-        self.link_capacities = capacities
-        return self.link_capacities
+        self.link_loads = capacities
+        return self.link_loads
+
+    def __str__(self):
+        text = "Flows for (demand, path):\n" + pformat(
+            self.flow_volume_mappings) + f"\nLink capacities: {self.link_loads}"
+        return text
