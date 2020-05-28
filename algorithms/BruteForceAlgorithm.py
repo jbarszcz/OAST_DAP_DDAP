@@ -27,10 +27,7 @@ def ddap(solutions: List[Solution], net: Net) -> Solution:
     best_cost = float("inf")
     best_solution = None
     for solution in solutions:
-        cost = 0
-        link_costs = solution.link_loads
-        for link_id, link_cost in enumerate(link_costs):
-            cost += net.links[link_id].unit_cost * link_costs[link_id]
+        cost = solution.calculate_ddap_cost(net)
         if cost < best_cost:
             best_cost = cost
             best_solution = solution
@@ -97,7 +94,7 @@ def get_complete_solution(demand_combination_matrix: List[List[Solution]], curre
     for demand_index, combination_index in enumerate(
             current_solution):  # to zawsze bedzie 6 dla net4 bo jest 6 demandow
         solution = demand_combination_matrix[demand_index][combination_index]
-        mapping = _add_mappings(mapping, solution.flow_volume_mappings)
+        mapping = _add_mappings(mapping, solution.allocation_pattern)
     return Solution(mapping)
 
 
