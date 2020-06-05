@@ -12,9 +12,14 @@ class Solution(object):
         self.link_loads = []
         self.number_of_links_with_exceeded_capacity = 0
         self.cost = INITIAL_COST
+        self.number_of_genes = 0
 
     def add_mappings(self, new_mappings: dict):
         self.allocation_pattern = {**self.allocation_pattern, **new_mappings}
+
+    def add_gene(self, gene: dict):
+        self.add_mappings(gene)
+        self.number_of_genes += 1
 
     def calculate_link_capacities(self, net: Net) -> list:
         links = net.links
@@ -37,6 +42,9 @@ class Solution(object):
             cost += net.links[link_id].unit_cost * self.link_loads[link_id]
         self.cost = cost
         return cost
+
+    def get_gene(self, demand_id):
+        return {key: value for key, value in self.allocation_pattern.items() if key[0] == demand_id}
 
     def __str__(self):
         # text = "Flows for (demand, path):\n" + pformat(

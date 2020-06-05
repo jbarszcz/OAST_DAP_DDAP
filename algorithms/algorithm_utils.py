@@ -2,7 +2,7 @@ from net.Demand import Demand
 from net.Solution import Solution
 from itertools import product
 from typing import List
-from collections import namedtuple
+import random
 
 
 def get_solutions_for_one_demand(demand: Demand) -> List[Solution]:  # get all flow combinations for one demand
@@ -29,4 +29,7 @@ def add_mappings(old: dict, new: dict) -> dict:
     return {**old, **new}
 
 
-#X = namedtuple("X", ["demand", "path"])
+def coin_toss() -> bool:
+    return random.random() > 0.5
+
+# X = namedtuple("X", ["demand", "path"])
