@@ -1,5 +1,6 @@
 from net import Net
 import math
+import random
 from pprint import pformat
 
 INITIAL_COST = float('inf')  # for evolutionary algorithms
@@ -17,9 +18,20 @@ class Solution(object):
     def add_mappings(self, new_mappings: dict):
         self.allocation_pattern = {**self.allocation_pattern, **new_mappings}
 
+    def get_gene(self, demand_id):
+        return {key: value for key, value in self.allocation_pattern.items() if key[0] == demand_id}
+
     def add_gene(self, gene: dict):
         self.add_mappings(gene)
         self.number_of_genes += 1
+
+    def mutate_gene(self, gene_number):
+        gene = self.get_gene(gene_number)
+        if len(gene) > 1:  # we cant mutate gene with only one value
+            flows = random.sample(list(gene), 2)
+            if self.allocation_pattern[flows[0]] > 0:
+                self.allocation_pattern[flows[0]] -= 1
+                self.allocation_pattern[flows[1]] += 1
 
     def calculate_link_capacities(self, net: Net) -> list:
         links = net.links
@@ -43,11 +55,9 @@ class Solution(object):
         self.cost = cost
         return cost
 
-    def get_gene(self, demand_id):
-        return {key: value for key, value in self.allocation_pattern.items() if key[0] == demand_id}
-
     def __str__(self):
         # text = "Flows for (demand, path):\n" + pformat(
         #     self.allocation_pattern) + f"\nLink capacities: {self.link_loads}"
         # return text
-        return str(self.allocation_pattern)
+        #return str(self.allocation_pattern)
+        return str(hash(str(self.allocation_pattern)))  + str(self.allocation_pattern)

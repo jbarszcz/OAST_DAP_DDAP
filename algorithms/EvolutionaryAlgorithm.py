@@ -6,17 +6,26 @@ from itertools import product
 from algorithms.algorithm_utils import *
 import random
 import math
+import copy
 
 
 class EvolutionaryAlgorithm:
-    def __init__(self, seed: int, net: Net, number_of_chromosomes: int, max_generations_without_improvement: int,
-                 percent_of_best_chromosomes: float, crossover_probability: float):
+    def __init__(self, seed: int,
+                 net: Net,
+                 number_of_chromosomes: int,
+                 max_generations_without_improvement: int,
+                 percent_of_best_chromosomes: float,
+                 crossover_probability: float,
+                 mutation_probability: float
+                 ):
+
         random.seed(seed)
         self.net = net
         self.number_of_chromosomes = number_of_chromosomes
-        self.generation = 0
+        self.generation = 1
         self.max_generations_without_improvement = max_generations_without_improvement
         self.crossover_probability = crossover_probability
+        self.mutation_probability = mutation_probability
 
         self.percent_of_best_chromosomes = percent_of_best_chromosomes
         self.number_of_best_chromosomes = round(number_of_chromosomes * percent_of_best_chromosomes)
@@ -24,42 +33,51 @@ class EvolutionaryAlgorithm:
 
     def ddap(self) -> Solution:
         population = self.get_initial_population()
-        best_cost = float('inf')
-        best_solution = None
 
-        progress_counter = 0
-        lack_of_improvement_counter = 0
+        while not self.end():
+            best_chromosome_previous_generation = Solution({})
 
-        while (self.compute_next()):
-            best_chromosome = Solution({})
             for chromosome in population:
-                if chromosome.calculate_ddap_cost(self.net) < best_chromosome.cost:
-                    best_chromosome = chromosome
+                if chromosome.calculate_ddap_cost(self.net) < best_chromosome_previous_generation.cost:
+                    best_chromosome_previous_generation = copy.deepcopy(chromosome)
 
             # sortowanie populacji wg kosztów chromosomów
-            population = self.upgrade_population(population, best_chromosome, "DDAP")
+            population = self.select_fittest(population, best_chromosome_previous_generation, algorithm="DDAP")
 
             # krzyzowanie
-            children = []
+            crossed_population = []
             while population:
                 parents = random.sample(population, 2)
                 population.remove(parents[0])
                 population.remove(parents[1])
-                children += (self.crossover(parents) if self.perform_crossover() else parents)
+                crossed_population += (self.crossover(parents) if self.crossover_occurs() else parents)
 
-            population = children
+            population = crossed_population
 
-            print("End of generation")
+            # mutacja
+            for chromosome in population:
+                if self.mutation_occurs():  # chromosome mutation
+                    for i in range(chromosome.number_of_genes):
+                        if self.mutation_occurs():  # gene mutation
+                            chromosome.mutate_gene(i + 1)
+
+            for chromosome in population:
+                chromosome.calculate_link_capacities(self.net)
+                chromosome.calculate_ddap_cost(self.net)
+
+            print(f"Generation: {self.generation} cost: {best_chromosome_previous_generation.cost}")
+            self.generation += 1
 
         print("End")
         return Solution({})
 
-    def upgrade_population(self, population: List, padding_chromosome: Solution, algorithm: str):
+    def select_fittest(self, population: List, padding_chromosome: Solution, algorithm: str):
         sort_criteria = (lambda x: x.cost) if algorithm == "DDAP" else (
             lambda x: x.number_of_links_with_exceeded_capacity)
         population.sort(key=sort_criteria)
         best_chromosomes = population[:self.number_of_best_chromosomes]
-        return best_chromosomes + [padding_chromosome] * self.population_padding
+        padding = [copy.deepcopy(padding_chromosome) for _ in range(self.population_padding)]
+        return best_chromosomes + padding
 
     def crossover(self, parents):
         father = parents[0]
@@ -93,12 +111,18 @@ class EvolutionaryAlgorithm:
             chromosome.calculate_link_capacities(self.net)
             chromosomes.append(chromosome)
 
-        population = [random.choice(chromosomes) for _ in range(self.number_of_chromosomes)]  # dlaczego tak jest??
+        population = [copy.deepcopy(random.choice(chromosomes)) for _ in
+                      range(self.number_of_chromosomes)]
 
+        #  population = [copy.deepcopy(chromosome) for chromosome in chromosomes]
         return population
 
-    def compute_next(self) -> bool:
-        return True
+    def end(self) -> bool:
+        return False
 
-    def perform_crossover(self) -> bool:
+    def crossover_occurs(self) -> bool:
         return random.random() < self.crossover_probability
+
+    def mutation_occurs(self) -> bool:
+        occurance = random.random() < self.mutation_probability
+        return occurance
