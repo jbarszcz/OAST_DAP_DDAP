@@ -14,6 +14,7 @@ class Solution(object):
         self.number_of_links_with_exceeded_capacity = 0
         self.cost = INITIAL_COST
         self.number_of_genes = 0
+        self.maximum_link_overload = INITIAL_COST
 
     def add_mappings(self, new_mappings: dict):
         self.allocation_pattern = {**self.allocation_pattern, **new_mappings}
@@ -43,17 +44,38 @@ class Solution(object):
                 if link_id + 1 in path.links:
                     volume = self.allocation_pattern.get((path.demand_id, path.path_id))
                     volume_sum += volume
-            capacities[link_id] = math.ceil(volume_sum / link.module)
+            capacities[link_id] = math.ceil(volume_sum / link.module) # wyklad str 14
 
         self.link_loads = capacities
         return self.link_loads
 
     def calculate_ddap_cost(self, net) -> float:
-        cost = 0
+        z = 0
         for link_id, link_cost in enumerate(self.link_loads):
-            cost += net.links[link_id].unit_cost * self.link_loads[link_id]
-        self.cost = cost
-        return cost
+            z += net.links[link_id].unit_cost * self.link_loads[link_id]
+        self.cost = z
+        return z
+
+    def calculate_dap_cost(self, net):
+        z = float('-inf')
+        for i, link_load in enumerate(self.link_loads):
+            _z = link_load - net.links[i].number_of_modules
+            if _z > z:
+                z = _z
+        self.maximum_link_overload = z
+        return z
+
+    # def dap(solutions: List[Solution], net: Net):
+    #     for solution in solutions:
+    #         finished = True
+    #         for i, link_load in enumerate(solution.link_loads):
+    #             # odejmujemy obciazenie od pojemnosci lacza
+    #             if min(0, net.links[i].number_of_modules - link_load) < 0:
+    #                 finished = False
+    #                 break  # pojemnosc przekroczona
+    #         if finished:
+    #             return solution
+    #     return None
 
     def __str__(self):
         text = "Flows for (demand, path):\n" + pformat(

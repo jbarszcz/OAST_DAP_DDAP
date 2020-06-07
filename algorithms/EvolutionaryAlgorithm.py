@@ -42,9 +42,6 @@ class EvolutionaryAlgorithm:
         self.number_of_best_chromosomes = round(number_of_chromosomes * percent_of_best_chromosomes)
         self.population_padding = number_of_chromosomes - self.number_of_best_chromosomes
 
-    def dap(self):
-        return None
-
     def ddap(self) -> Solution:
         population = self.get_initial_population()
         final_solution = Solution({})
@@ -93,9 +90,57 @@ class EvolutionaryAlgorithm:
 
         return final_solution
 
+    def dap(self) -> Solution:
+        population = self.get_initial_population()
+        final_solution = Solution({})
+        self.start_time = time.time()
+
+        while not self.end():
+            best_chromosome_in_generation = Solution({})
+
+            for chromosome in population:
+                if chromosome.calculate_dap_cost(self.net) < best_chromosome_in_generation.maximum_link_overload:
+                    best_chromosome_in_generation = copy.deepcopy(chromosome)
+
+            if best_chromosome_in_generation.maximum_link_overload < final_solution.maximum_link_overload:
+                final_solution = copy.deepcopy(best_chromosome_in_generation)
+                self.no_progress = 0
+            else:
+                self.no_progress += 1
+
+            # sortowanie populacji wg kosztów chromosomów
+            population = self.select_fittest(population, algorithm="DAP")
+
+            # krzyzowanie
+            crossed_population = []
+            while population:
+                parents = random.sample(population, 2)
+                population.remove(parents[0])
+                population.remove(parents[1])
+                crossed_population += (self.crossover(parents) if self._crossover_occurs() else parents)
+
+            population = crossed_population
+
+            # mutacja
+            for chromosome in population:
+                if self._mutation_occurs():  # chromosome mutation
+                    for i in range(chromosome.number_of_genes):
+                        if self._mutation_occurs():  # gene mutation
+                            chromosome.mutate_gene(i + 1)
+                            self.mutations += 1
+
+            for chromosome in population:
+                chromosome.calculate_link_capacities(self.net)
+                chromosome.calculate_dap_cost(self.net)
+
+            print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.maximum_link_overload}")
+            self.generation += 1
+
+        return final_solution
+
     def select_fittest(self, population: List, algorithm: str):
         sort_criteria = (lambda x: x.cost) if algorithm == "DDAP" else (
-            lambda x: x.number_of_links_with_exceeded_capacity)
+            lambda x: x.maximum_link_overload)
         population.sort(key=sort_criteria)
         best_chromosomes = population[:self.number_of_best_chromosomes]
         padding = [copy.deepcopy(best_chromosomes[i]) for i in range(

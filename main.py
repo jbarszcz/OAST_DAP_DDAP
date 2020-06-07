@@ -4,6 +4,9 @@ from algorithms.EvolutionaryAlgorithm import EvolutionaryAlgorithm
 from algorithms import BruteForceAlgorithm
 from configparser import ConfigParser
 
+# zapis trajektorii
+# czas optymalizacji
+
 if __name__ == "__main__":
     config_parser = ConfigParser()
     config_parser.read("config.ini")
@@ -11,12 +14,15 @@ if __name__ == "__main__":
     net_parser = NetParser()
     net = net_parser.parse_file("input_files/" + config_parser.get("general", "input_file"))
 
+    problem = config_parser.get("general", "problem")
     algorithm = config_parser.get("general", "algorithm")
+    input_file = config_parser.get("general", "input_file")
+
     if algorithm == "BFA":
-        solution = BruteForceAlgorithm.compute(net, problem="DDAP") if config_parser.get("general",
-                                                                                         "input_file") in ["net4.txt",
-                                                                                                           "net_test.txt"] else print(
-            "Dont brick your computer!")
+        solution = BruteForceAlgorithm.compute(net, problem=problem) if input_file in ["net4.txt",
+                                                                                       "net_test.txt"] \
+            else \
+            print("Dont brick your computer!")
 
     elif algorithm == "EA":
 
@@ -33,7 +39,6 @@ if __name__ == "__main__":
             mutation_probability=config_parser.getfloat("EA", "mutation_probability")
         )
 
-        problem = config_parser.get("general", "problem")
         solution = None
         if problem == "DDAP":
             solution = EA.ddap()

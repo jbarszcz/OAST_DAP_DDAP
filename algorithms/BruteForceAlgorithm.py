@@ -20,6 +20,7 @@ def compute(net: Net, problem: str):
     if problem == "DAP":
         dap_solution = dap(solutions, net)
         print(dap_solution) if dap_solution else print("Couldn't solve the DAP problem.")
+        return dap_solution
 
 
 def ddap(solutions: List[Solution], net: Net) -> Solution:
@@ -37,17 +38,31 @@ def ddap(solutions: List[Solution], net: Net) -> Solution:
     return best_solution
 
 
+# def dap(solutions: List[Solution], net: Net):
+#     for solution in solutions:
+#         finished = True
+#         for i, link_load in enumerate(solution.link_loads):
+#             # odejmujemy obciazenie od pojemnosci lacza
+#             if min(0, net.links[i].number_of_modules - link_load) < 0:
+#                 finished = False
+#                 break  # pojemnosc przekroczona
+#         if finished:
+#             return solution
+#     return None
+
 def dap(solutions: List[Solution], net: Net):
+    print("current best cost is: ", end="")
+    best_cost = float("inf")
+    best_solution = None
     for solution in solutions:
-        finished = True
-        for i, link_load in enumerate(solution.link_loads):
-            # odejmujemy obciazenie od pojemnosci lacza
-            if min(0, net.links[i].number_of_modules - link_load) < 0:
-                finished = False
-                break  # pojemnosc przekroczona
-        if finished:
-            return solution
-    return None
+        cost = solution.calculate_dap_cost(net)
+        if cost < best_cost:
+            best_cost = cost
+            best_solution = solution
+            print(f" {best_cost}", end="")
+    print("\n-------")
+    print(f"final best cost: {best_cost}")
+    return best_solution
 
 
 def get_solutions_for_one_demand(demand: Demand) -> List[Solution]:  # get all flow combinations for one demand

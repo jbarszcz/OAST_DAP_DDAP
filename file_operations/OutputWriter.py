@@ -12,9 +12,9 @@ class OutputWriter:
             number_of_link_loads = len(solution.link_loads)
             out_file.write(f"{number_of_link_loads}\n\n")
 
-            for id, fibers in enumerate(solution.link_loads):
-                out_file.write(f"{id + 1} ")
-                signals = self.net.links[id].module * fibers
+            for link_id, fibers in enumerate(solution.link_loads):
+                out_file.write(f"{link_id + 1} ")
+                signals = self.net.links[link_id].module * fibers
                 out_file.write(f"{signals} ")
                 out_file.write(f"{fibers}\n")
 
