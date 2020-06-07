@@ -56,8 +56,9 @@ class Solution(object):
         return cost
 
     def __str__(self):
-        # text = "Flows for (demand, path):\n" + pformat(
-        #     self.allocation_pattern) + f"\nLink capacities: {self.link_loads}"
+        text = "Flows for (demand, path):\n" + pformat(
+            self.allocation_pattern) + f"\n\nLink loads: {self.link_loads}\n\nCost: {self.cost}"
         # return text
         # return str(self.allocation_pattern)
-        return str(hash(str(self.allocation_pattern))) + " " + str(self.allocation_pattern)
+        # return str(hash(str(self.allocation_pattern))) + " " + str(self.allocation_pattern)
+        return text
