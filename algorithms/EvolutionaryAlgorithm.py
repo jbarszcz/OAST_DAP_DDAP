@@ -76,7 +76,7 @@ class EvolutionaryAlgorithm:
             lambda x: x.number_of_links_with_exceeded_capacity)
         population.sort(key=sort_criteria)
         best_chromosomes = population[:self.number_of_best_chromosomes]
-        padding = [copy.deepcopy(padding_chromosome) for _ in range(self.population_padding)]
+        padding = [copy.deepcopy(best_chromosomes[i]) for i in range(self.population_padding)] # to nie powinny być identyczne chromosomy, tylko X najlepszych chromosomów
         return best_chromosomes + padding
 
     def crossover(self, parents):
@@ -111,11 +111,9 @@ class EvolutionaryAlgorithm:
             chromosome.calculate_link_capacities(self.net)
             chromosomes.append(chromosome)
 
-        population = [copy.deepcopy(random.choice(chromosomes)) for _ in
-                      range(self.number_of_chromosomes)]
+        random.shuffle(chromosomes)
 
-        #  population = [copy.deepcopy(chromosome) for chromosome in chromosomes]
-        return population
+        return chromosomes
 
     def end(self) -> bool:
         return False

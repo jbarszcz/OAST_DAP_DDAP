@@ -59,5 +59,5 @@ class Solution(object):
         # text = "Flows for (demand, path):\n" + pformat(
         #     self.allocation_pattern) + f"\nLink capacities: {self.link_loads}"
         # return text
-        #return str(self.allocation_pattern)
-        return str(hash(str(self.allocation_pattern)))  + str(self.allocation_pattern)
+        # return str(self.allocation_pattern)
+        return str(hash(str(self.allocation_pattern))) + " " + str(self.allocation_pattern)

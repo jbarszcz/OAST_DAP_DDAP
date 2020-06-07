@@ -12,13 +12,13 @@ if __name__ == "__main__":
 
 #    solution = BruteForceAlgorithm.compute(net, problem="DDAP") if NET_FILE_NAME =="input_files/net4.txt" else print("Dont brick your computer!")
 
-    # lucky seed 12398789708769875786956486745464
-    alg = EvolutionaryAlgorithm(seed=12398789708769875786956486745464,
+    # lucky seed 12398789708769875786956486745464 best cost=32 2 130 iteracji
+    alg = EvolutionaryAlgorithm(seed=123,
                                 net=net,
                                 number_of_chromosomes=1000,
                                 max_generations_without_improvement=10,
                                 percent_of_best_chromosomes=0.7,
                                 crossover_probability=0.6,
-                                mutation_probability=0.00
+                                mutation_probability=0.02
                                 ).ddap()
 
