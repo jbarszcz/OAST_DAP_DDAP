@@ -1,8 +1,8 @@
 class Link:
 
     def __init__(self, data, link_id):
-        self.node1 = data[0]
-        self.node2 = data[1]
+        self.node1 = data[0] # node1 id
+        self.node2 = data[1] # node2 id
         self.number_of_modules = int(data[2])
         self.unit_cost = int(data[3])
         self.module = int(data[4])

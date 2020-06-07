@@ -15,7 +15,7 @@ def compute(net: Net, problem: str):
     if problem == "DDAP":
         print("solving ddap with bruteforce method...")
         ddap_solution = ddap(solutions, net)
-        print(ddap_solution)
+        return ddap_solution
 
     if problem == "DAP":
         dap_solution = dap(solutions, net)

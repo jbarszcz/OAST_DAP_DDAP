@@ -64,7 +64,7 @@ class EvolutionaryAlgorithm:
                 self.no_progress += 1
 
             # sortowanie populacji wg kosztów chromosomów
-            population = self.select_fittest(population, best_chromosome_in_generation, algorithm="DDAP")
+            population = self.select_fittest(population, algorithm="DDAP")
 
             # krzyzowanie
             crossed_population = []
@@ -72,15 +72,15 @@ class EvolutionaryAlgorithm:
                 parents = random.sample(population, 2)
                 population.remove(parents[0])
                 population.remove(parents[1])
-                crossed_population += (self.crossover(parents) if self.crossover_occurs() else parents)
+                crossed_population += (self.crossover(parents) if self._crossover_occurs() else parents)
 
             population = crossed_population
 
             # mutacja
             for chromosome in population:
-                if self.mutation_occurs():  # chromosome mutation
+                if self._mutation_occurs():  # chromosome mutation
                     for i in range(chromosome.number_of_genes):
-                        if self.mutation_occurs():  # gene mutation
+                        if self._mutation_occurs():  # gene mutation
                             chromosome.mutate_gene(i + 1)
                             self.mutations += 1
 
@@ -91,10 +91,9 @@ class EvolutionaryAlgorithm:
             print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.cost}")
             self.generation += 1
 
-        print("End")
         return final_solution
 
-    def select_fittest(self, population: List, padding_chromosome: Solution, algorithm: str):
+    def select_fittest(self, population: List, algorithm: str):
         sort_criteria = (lambda x: x.cost) if algorithm == "DDAP" else (
             lambda x: x.number_of_links_with_exceeded_capacity)
         population.sort(key=sort_criteria)
@@ -162,9 +161,8 @@ class EvolutionaryAlgorithm:
 
         return False
 
-    def crossover_occurs(self) -> bool:
+    def _crossover_occurs(self) -> bool:
         return random.random() < self.crossover_probability
 
-    def mutation_occurs(self) -> bool:
-        occurance = random.random() < self.mutation_probability
-        return occurance
+    def _mutation_occurs(self) -> bool:
+        return random.random() < self.mutation_probability
