@@ -6,17 +6,22 @@ class OutputWriter:
     def __init__(self, net):
         self.net = net
 
-    def save_solution(self, solution: Chromosome, file_name: str):
+    def save_solution(self, solution: Chromosome, net: Net, file_name: str):
         with open(file_name, "w+") as out_file:
             # number of links
-            number_of_link_loads = len(solution.link_values)
-            out_file.write(f"{number_of_link_loads}\n\n")
+            number_of_links = len(net.links)
+            out_file.write(f"{number_of_links}\n\n")
 
-            for link_id, fibers in enumerate(solution.link_values):
+            # for link_id, fibers in enumerate(solution.li):
+            #     out_file.write(f"{link_id + 1} ")
+            #     signals = self.net.links[link_id].module * fibers
+            #     out_file.write(f"{signals} ")
+            #     out_file.write(f"{fibers}\n")
+
+            for link_id in range(number_of_links):
                 out_file.write(f"{link_id + 1} ")
-                signals = self.net.links[link_id].module * fibers
-                out_file.write(f"{signals} ")
-                out_file.write(f"{fibers}\n")
+                out_file.write(f"{solution.link_loads[link_id]} ")
+                out_file.write(f"{solution.link_sizes[link_id]}\n")
 
             out_file.write("\n")
             number_of_demands = len(self.net.demands)
@@ -34,3 +39,12 @@ class OutputWriter:
                 out_file.write("\n")
 
             print(f"Output saved to: {file_name}")
+
+    def save_history(self, history, file_name: str):
+        with open(file_name, "w+") as out_file:
+            for generation, solution in enumerate(history):
+                out_file.write("#" * 20 + f" Generation: {generation + 1} " + "#" * 20 + "\n\n")
+                out_file.write(f"{solution}")
+                out_file.write("\n")
+                out_file.write("\n")
+        print(f"History saved to: {file_name}")

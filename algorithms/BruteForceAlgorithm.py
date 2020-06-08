@@ -12,7 +12,7 @@ def compute(net: Net, problem: str) -> Chromosome:
     solutions = get_all_possible_chromosomes(net.demands)
     print("calculating link capacities...")
     for solution in solutions:
-        solution.calculate_links(net, problem=problem)
+        solution.calculate_links_for_problem(net, problem=problem)
 
     print("current best cost is: ", end="")
 

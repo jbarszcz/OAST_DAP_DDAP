@@ -9,7 +9,12 @@ import sys
 # czas optymalizacji
 
 if __name__ == "__main__":
-    config_parser = ConfigParser()
+    config_parser = ConfigParser({
+        "max_no_progress_generations": sys.maxsize,
+        "max_generations": sys.maxsize,
+        "max_mutations": sys.maxsize,
+        "max_time": sys.maxsize}
+    )
     config_parser.read("config.ini")
     solution = None
     net_parser = NetParser()
@@ -18,6 +23,7 @@ if __name__ == "__main__":
     problem = config_parser.get("general", "problem")
     algorithm = config_parser.get("general", "algorithm")
     input_file = config_parser.get("general", "input_file")
+    output_writer = OutputWriter(net=net)
 
     if problem not in ["DAP", "DDAP"]:
         print(f"Incorrect problem: {problem}. Choose DAP or DDAP.")
@@ -32,13 +38,9 @@ if __name__ == "__main__":
         exit()
 
     if algorithm == "BFA":
-        solution = BruteForceAlgorithm.compute(net, problem=problem) if input_file in ["net4.txt",
-                                                                                       "net_test.txt"] \
-            else \
-            print("Dont brick your computer!")
+        solution = BruteForceAlgorithm.compute(net, problem=problem)
 
     elif algorithm == "EA":
-
         EA = EvolutionaryAlgorithm(
             problem=problem,
             net=net,
@@ -55,5 +57,12 @@ if __name__ == "__main__":
 
         solution = EA.compute()
 
-    output_writer = OutputWriter(net=net)
-    output_writer.save_solution(solution=solution, file_name=config_parser.get("general", "output_file"))
+        print(f"\nFinal solution:\n{solution}\n")
+
+        for solution in EA.history:
+            solution.calculate_links(net)
+
+        output_writer.save_history(EA.history, file_name=config_parser.get("general", "history_file"))
+
+    solution.calculate_links(net)
+    output_writer.save_solution(solution=solution, net=net, file_name=config_parser.get("general", "output_file"))

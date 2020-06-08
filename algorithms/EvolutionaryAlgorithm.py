@@ -3,7 +3,7 @@ from net.Net import Net
 from typing import List
 import random
 import copy
-import time
+from time import time
 import algorithms
 
 
@@ -27,7 +27,7 @@ class EvolutionaryAlgorithm:
         self.problem = problem
         self.net = net
         self.number_of_chromosomes = number_of_chromosomes
-        self.generation = 1
+        self.generation = 0
         self.no_progress = 0
         self.mutations = 0
         self.max_generations = max_generations
@@ -38,7 +38,7 @@ class EvolutionaryAlgorithm:
         self.mutation_probability = mutation_probability
 
         self.start_time = None
-        self.solution_history = []
+        self.history = []
 
         self.percent_of_best_chromosomes = percent_of_best_chromosomes
         self.number_of_best_chromosomes = round(number_of_chromosomes * percent_of_best_chromosomes)
@@ -47,15 +47,21 @@ class EvolutionaryAlgorithm:
     def compute(self) -> Chromosome:
         population = self._get_initial_population()
         final_solution = Chromosome({})
-        self.start_time = time.time()
+        self.start_time = time()
 
         while not self._end():
+            self.generation += 1
             best_chromosome_in_generation = Chromosome({})
 
             for chromosome in population:
+                chromosome.calculate_links_for_problem(self.net, self.problem)
                 if chromosome.calculate_z(self.net, self.problem) < best_chromosome_in_generation.z:
                     best_chromosome_in_generation = copy.deepcopy(
-                        chromosome)  # bezsensowna iteracja, to jest robione juz na koncu
+                        chromosome)
+
+            self.history.append(best_chromosome_in_generation)
+
+            print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.z}")
 
             if best_chromosome_in_generation.z < final_solution.z:
                 final_solution = copy.deepcopy(best_chromosome_in_generation)
@@ -84,13 +90,7 @@ class EvolutionaryAlgorithm:
                             chromosome.mutate_gene(i + 1)
                             self.mutations += 1
 
-            for chromosome in population:
-                chromosome.calculate_links(self.net, self.problem)
-                chromosome.calculate_z(self.net, self.problem)
-
-            print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.z}")
-            self.generation += 1
-
+        print(f"Computation ended in {round(time() - self.start_time, 2)} s.")
         return final_solution
 
     def _select_fittest(self, population: List):
@@ -118,40 +118,38 @@ class EvolutionaryAlgorithm:
         return [brother, sister]
 
     def _get_initial_population(self) -> List:
-        # dla kazdego demandu lista kombinacji sciezek i przeplywow
         all_genes_combinations = [algorithms.get_all_possible_chromosomes_with_one_gene(demand) for demand in
                                   self.net.demands]
         chromosomes = []
 
-        # tworzymy chromosomy, czyli losowe rozwiazania dla kazdego demandu
         for i in range(self.number_of_chromosomes):
             chromosome = Chromosome({})
             for gene_combination in all_genes_combinations:
                 gene = random.choice(gene_combination).allocation_pattern
                 chromosome.add_gene(gene)
-            chromosome.calculate_links(self.net, problem=self.problem)
+            chromosome.calculate_links_for_problem(self.net, problem=self.problem)
             chromosomes.append(chromosome)
 
         random.shuffle(chromosomes)
         return chromosomes
 
     def _end(self) -> bool:
-        time_exceeded = time.time() - self.start_time > self.max_time
+        time_exceeded = time() - self.start_time >= self.max_time
         if time_exceeded:
             print("Computation stopped because of time limit.")
             return True
 
-        generations_exceeded = self.generation > self.max_generations
+        generations_exceeded = self.generation >= self.max_generations
         if generations_exceeded:
             print("Computation stopped because of generations limit.")
             return True
 
-        mutations_exceeded = self.mutations > self.max_mutations
+        mutations_exceeded = self.mutations >= self.max_mutations
         if mutations_exceeded:
             print("Computation stopped because of mutations limit.")
             return True
 
-        no_progress = self.no_progress > self.max_no_progress_generations
+        no_progress = self.no_progress >= self.max_no_progress_generations
         if no_progress:
             print("Computation stopped because of no progress limit.")
             return True
