@@ -45,7 +45,7 @@ class EvolutionaryAlgorithm:
         self.population_padding = number_of_chromosomes - self.number_of_best_chromosomes
 
     def compute(self) -> Chromosome:
-        # wybor poczatkowej populacji
+        # choose starting population
         population = self._get_initial_population()
         final_solution = Chromosome({})
         self.start_time = time()
@@ -54,7 +54,7 @@ class EvolutionaryAlgorithm:
             self.generation += 1
             best_chromosome_in_generation = Chromosome({})
 
-            # wyliczenie funkcji kosztu dla generacji
+            # calculate cost function for current generation
             for chromosome in population:
                 chromosome.calculate_links_for_problem(self.net, self.problem)
                 if chromosome.calculate_z(self.net, self.problem) < best_chromosome_in_generation.z:
@@ -71,10 +71,10 @@ class EvolutionaryAlgorithm:
             else:
                 self.no_progress += 1
 
-            # eliminacja najslabszych osobnikow
+            # eliminate weakest chromosomes
             population = self._select_fittest(population)
 
-            # krzyzowanie
+            # crossover
             crossed_population = []
             while len(population) > 1:
                 parents = random.sample(population, 2)
@@ -84,7 +84,7 @@ class EvolutionaryAlgorithm:
 
             population += crossed_population
 
-            # mutacja
+            # mutation
             for chromosome in population:
                 if self._mutation_occurs():  # chromosome mutation
                     for i in range(chromosome.number_of_genes):
@@ -93,6 +93,13 @@ class EvolutionaryAlgorithm:
                             self.mutations += 1
 
         print(f"Computation ended in {round(time() - self.start_time, 2)} s.")
+
+        # calculate link values for both problems to save full information in output files
+        for solution in self.history:
+            solution.calculate_links(self.net)
+
+        final_solution.calculate_links(self.net)
+
         return final_solution
 
     def _select_fittest(self, population: List):

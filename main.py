@@ -6,6 +6,7 @@ from configparser import ConfigParser
 import sys
 
 if __name__ == "__main__":
+    # set default end criteria to virtually infinity
     config_parser = ConfigParser({
         "max_no_progress_generations": sys.maxsize,
         "max_generations": sys.maxsize,
@@ -13,13 +14,14 @@ if __name__ == "__main__":
         "max_time": sys.maxsize}
     )
     config_parser.read("config.ini")
-    solution = None
-    net_parser = NetParser()
-    net = net_parser.parse_file("input_files/" + config_parser.get("general", "input_file"))
 
     problem = config_parser.get("general", "problem")
     algorithm = config_parser.get("general", "algorithm")
     input_file = config_parser.get("general", "input_file")
+
+    solution = None
+    net_parser = NetParser()
+    net = net_parser.parse_file("input_files/" + config_parser.get("general", "input_file"))
     output_writer = OutputWriter(net=net)
 
     if problem not in ["DAP", "DDAP"]:
@@ -27,11 +29,11 @@ if __name__ == "__main__":
         exit()
 
     if algorithm not in ["BFA", "EA"]:
-        print(f"Incorrect problem: {algorithm}. Choose BFA or EA.")
+        print(f"Incorrect algorithm: {algorithm}. Choose BFA or EA.")
         exit()
 
     if algorithm == "BFA" and input_file != "net4.txt":
-        print("This may hang your computer.")
+        print("Bad idea.")
         exit()
 
     if algorithm == "BFA":
@@ -53,13 +55,7 @@ if __name__ == "__main__":
         )
 
         solution = EA.compute()
-
-        # calculate link values for both problems to save full information in output files
-        for solution in EA.history:
-            solution.calculate_links(net)
-
         output_writer.save_history(EA.history, file_name=config_parser.get("general", "history_file"))
 
-    solution.calculate_links(net)
     print(f"\nFinal solution:\n{solution}\n")
     output_writer.save_solution(solution=solution, file_name=config_parser.get("general", "output_file"))
