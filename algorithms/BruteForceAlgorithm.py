@@ -33,7 +33,7 @@ def get_all_possible_chromosomes(demands: List[Demand]) -> List[Chromosome]:
     all_combinations_all_demands = [algorithms.get_all_possible_chromosomes_with_one_gene(demand) for demand in demands]
     indexes = [range(len(combination)) for combination in all_combinations_all_demands]
     solution_indexes = list(product(*indexes))
-    print("generating all possible solutions... ", end="")
+    print("Generating all possible solutions... ", end="")
     solutions = [get_complete_chromosome(all_combinations_all_demands, current_solution_index) for
                  current_solution_index
                  in solution_indexes]

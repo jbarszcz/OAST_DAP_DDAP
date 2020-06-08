@@ -5,8 +5,6 @@ from net.Route import Route
 
 
 class NetParser:
-    def __init__(self):
-        pass
 
     @staticmethod
     def parse_line(raw_line: str):

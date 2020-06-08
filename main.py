@@ -62,4 +62,4 @@ if __name__ == "__main__":
 
     solution.calculate_links(net)
     print(f"\nFinal solution:\n{solution}\n")
-    output_writer.save_solution(solution=solution, net=net, file_name=config_parser.get("general", "output_file"))
+    output_writer.save_solution(solution=solution, file_name=config_parser.get("general", "output_file"))

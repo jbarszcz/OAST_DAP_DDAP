@@ -6,9 +6,9 @@ class OutputWriter:
     def __init__(self, net):
         self.net = net
 
-    def save_solution(self, solution: Chromosome, net: Net, file_name: str):
+    def save_solution(self, solution: Chromosome, file_name: str):
         with open(file_name, "w+") as out_file:
-            number_of_links = len(net.links)
+            number_of_links = len(self.net.links)
             out_file.write(f"{number_of_links}\n\n")
 
             for link_id in range(number_of_links):
@@ -34,7 +34,7 @@ class OutputWriter:
             print(f"Output saved to: {file_name}")
 
     @staticmethod
-    def save_history(self, history, file_name: str):
+    def save_history(history, file_name: str):
         with open(file_name, "w+") as out_file:
             for generation, solution in enumerate(history):
                 out_file.write("#" * 20 + f" Generation: {generation + 1} " + "#" * 20 + "\n\n")
