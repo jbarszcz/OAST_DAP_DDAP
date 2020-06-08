@@ -10,7 +10,7 @@ def compute(net: Net, problem: str):
     solutions = get_all_solutions(demands)
     print("calculating link capacities...")
     for solution in solutions:
-        solution.calculate_link_capacities(net)
+        solution.calculate_links(net)
 
     if problem == "DDAP":
         print("solving ddap with bruteforce method...")
@@ -35,6 +35,7 @@ def ddap(solutions: List[Solution], net: Net) -> Solution:
             print(f" {best_cost}", end="")
     print("\n-------")
     print(f"final best cost: {best_cost}")
+    print(best_solution)
     return best_solution
 
 

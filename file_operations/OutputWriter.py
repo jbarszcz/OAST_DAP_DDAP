@@ -9,10 +9,10 @@ class OutputWriter:
     def save_solution(self, solution: Solution, file_name: str):
         with open(file_name, "w+") as out_file:
             # number of links
-            number_of_link_loads = len(solution.link_loads)
+            number_of_link_loads = len(solution.link_sizes)
             out_file.write(f"{number_of_link_loads}\n\n")
 
-            for link_id, fibers in enumerate(solution.link_loads):
+            for link_id, fibers in enumerate(solution.link_sizes):
                 out_file.write(f"{link_id + 1} ")
                 signals = self.net.links[link_id].module * fibers
                 out_file.write(f"{signals} ")

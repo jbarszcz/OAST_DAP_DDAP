@@ -82,7 +82,7 @@ class EvolutionaryAlgorithm:
                             self.mutations += 1
 
             for chromosome in population:
-                chromosome.calculate_link_capacities(self.net)
+                chromosome.calculate_links(self.net)
                 chromosome.calculate_ddap_cost(self.net)
 
             print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.cost}")
@@ -130,7 +130,7 @@ class EvolutionaryAlgorithm:
                             self.mutations += 1
 
             for chromosome in population:
-                chromosome.calculate_link_capacities(self.net)
+                chromosome.calculate_links(self.net)
                 chromosome.calculate_dap_cost(self.net)
 
             print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.maximum_link_overload}")
@@ -176,7 +176,7 @@ class EvolutionaryAlgorithm:
             for gene_combination in all_genes_combinations:
                 gene = random.choice(gene_combination).allocation_pattern
                 chromosome.add_gene(gene)
-            chromosome.calculate_link_capacities(self.net)
+            chromosome.calculate_links(self.net)
             chromosomes.append(chromosome)
 
         random.shuffle(chromosomes)
