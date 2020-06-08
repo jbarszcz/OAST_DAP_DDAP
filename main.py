@@ -5,9 +5,6 @@ from algorithms import BruteForceAlgorithm
 from configparser import ConfigParser
 import sys
 
-# zapis trajektorii
-# czas optymalizacji
-
 if __name__ == "__main__":
     config_parser = ConfigParser({
         "max_no_progress_generations": sys.maxsize,
@@ -57,12 +54,12 @@ if __name__ == "__main__":
 
         solution = EA.compute()
 
-        print(f"\nFinal solution:\n{solution}\n")
-
+        # calculate link values for both problems to save full information in output files
         for solution in EA.history:
             solution.calculate_links(net)
 
         output_writer.save_history(EA.history, file_name=config_parser.get("general", "history_file"))
 
     solution.calculate_links(net)
+    print(f"\nFinal solution:\n{solution}\n")
     output_writer.save_solution(solution=solution, net=net, file_name=config_parser.get("general", "output_file"))

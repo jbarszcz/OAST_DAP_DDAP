@@ -8,15 +8,8 @@ class OutputWriter:
 
     def save_solution(self, solution: Chromosome, net: Net, file_name: str):
         with open(file_name, "w+") as out_file:
-            # number of links
             number_of_links = len(net.links)
             out_file.write(f"{number_of_links}\n\n")
-
-            # for link_id, fibers in enumerate(solution.li):
-            #     out_file.write(f"{link_id + 1} ")
-            #     signals = self.net.links[link_id].module * fibers
-            #     out_file.write(f"{signals} ")
-            #     out_file.write(f"{fibers}\n")
 
             for link_id in range(number_of_links):
                 out_file.write(f"{link_id + 1} ")
@@ -40,6 +33,7 @@ class OutputWriter:
 
             print(f"Output saved to: {file_name}")
 
+    @staticmethod
     def save_history(self, history, file_name: str):
         with open(file_name, "w+") as out_file:
             for generation, solution in enumerate(history):

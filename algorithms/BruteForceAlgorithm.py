@@ -10,11 +10,11 @@ import algorithms
 def compute(net: Net, problem: str) -> Chromosome:
     start_time = time()
     solutions = get_all_possible_chromosomes(net.demands)
-    print("calculating link capacities...")
+    print("Calculating link capacities...")
     for solution in solutions:
         solution.calculate_links_for_problem(net, problem=problem)
 
-    print("current best cost is: ", end="")
+    print("Current best cost is: ", end="")
 
     best_cost = float("inf")
     best_solution = None
@@ -24,10 +24,7 @@ def compute(net: Net, problem: str) -> Chromosome:
             best_cost = cost
             best_solution = solution
             print(f" {best_cost}", end="")
-    print("\n-------")
-    print(f"Solution found in {round(time() - start_time, 2)} s.")
-    print(f"final best cost: {best_cost}")
-    print(best_solution)
+    print(f"\nSolution found in {round(time() - start_time, 2)} s.")
 
     return best_solution
 

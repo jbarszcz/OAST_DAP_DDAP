@@ -45,6 +45,7 @@ class EvolutionaryAlgorithm:
         self.population_padding = number_of_chromosomes - self.number_of_best_chromosomes
 
     def compute(self) -> Chromosome:
+        # wybor poczatkowej populacji
         population = self._get_initial_population()
         final_solution = Chromosome({})
         self.start_time = time()
@@ -53,6 +54,7 @@ class EvolutionaryAlgorithm:
             self.generation += 1
             best_chromosome_in_generation = Chromosome({})
 
+            # wyliczenie funkcji kosztu dla generacji
             for chromosome in population:
                 chromosome.calculate_links_for_problem(self.net, self.problem)
                 if chromosome.calculate_z(self.net, self.problem) < best_chromosome_in_generation.z:

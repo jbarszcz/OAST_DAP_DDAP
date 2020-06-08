@@ -3,7 +3,7 @@ import math
 import random
 from pprint import pformat
 
-INITIAL_COST = float('inf')  # for evolutionary algorithms
+INITIAL_COST = float('inf')
 
 
 class Chromosome(object):
@@ -32,6 +32,7 @@ class Chromosome(object):
                 self.allocation_pattern[flows[0]] -= 1
                 self.allocation_pattern[flows[1]] += 1
 
+    # used in actual computation, because we need to only optimize link values for one problem
     def calculate_links_for_problem(self, net: Net, problem: str):
         links = net.links
         link_values = [0] * len(net.links)
@@ -48,21 +49,22 @@ class Chromosome(object):
         else:
             self.link_loads = link_values
 
+    # used for saving results purposes
     def calculate_links(self, net: Net):
         self.calculate_links_for_problem(net, "DDAP")
         self.calculate_links_for_problem(net, "DAP")
 
     def calculate_z(self, net: Net, problem: str):
-        return self.calculate_ddap_cost(net) if problem == "DDAP" else self.calculate_dap_cost(net)
+        return self._calculate_ddap_z(net) if problem == "DDAP" else self._calculate_dap_z(net)
 
-    def calculate_ddap_cost(self, net) -> float:
+    def _calculate_ddap_z(self, net) -> float:
         z = 0
         for link_id, link_size in enumerate(self.link_sizes):
             z += net.links[link_id].unit_cost * link_size
         self.z = z
         return z
 
-    def calculate_dap_cost(self, net):
+    def _calculate_dap_z(self, net):
         z = float('-inf')
         for i, link_load in enumerate(self.link_loads):
             _z = link_load - net.links[i].number_of_modules * net.links[i].module
