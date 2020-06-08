@@ -1,4 +1,4 @@
-from net.Solution import Solution
+from net.Chromosome import Chromosome
 from net.Net import Net
 
 
@@ -6,13 +6,13 @@ class OutputWriter:
     def __init__(self, net):
         self.net = net
 
-    def save_solution(self, solution: Solution, file_name: str):
+    def save_solution(self, solution: Chromosome, file_name: str):
         with open(file_name, "w+") as out_file:
             # number of links
-            number_of_link_loads = len(solution.link_sizes)
+            number_of_link_loads = len(solution.link_values)
             out_file.write(f"{number_of_link_loads}\n\n")
 
-            for link_id, fibers in enumerate(solution.link_sizes):
+            for link_id, fibers in enumerate(solution.link_values):
                 out_file.write(f"{link_id + 1} ")
                 signals = self.net.links[link_id].module * fibers
                 out_file.write(f"{signals} ")

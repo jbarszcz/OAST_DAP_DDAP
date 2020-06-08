@@ -3,6 +3,7 @@ from file_operations.OutputWriter import OutputWriter
 from algorithms.EvolutionaryAlgorithm import EvolutionaryAlgorithm
 from algorithms import BruteForceAlgorithm
 from configparser import ConfigParser
+import sys
 
 # zapis trajektorii
 # czas optymalizacji
@@ -17,6 +18,18 @@ if __name__ == "__main__":
     problem = config_parser.get("general", "problem")
     algorithm = config_parser.get("general", "algorithm")
     input_file = config_parser.get("general", "input_file")
+
+    if problem not in ["DAP", "DDAP"]:
+        print(f"Incorrect problem: {problem}. Choose DAP or DDAP.")
+        exit()
+
+    if algorithm not in ["BFA", "EA"]:
+        print(f"Incorrect problem: {algorithm}. Choose BFA or EA.")
+        exit()
+
+    if algorithm == "BFA" and input_file != "net4.txt":
+        print("This may hang your computer.")
+        exit()
 
     if algorithm == "BFA":
         solution = BruteForceAlgorithm.compute(net, problem=problem) if input_file in ["net4.txt",
@@ -40,13 +53,7 @@ if __name__ == "__main__":
             mutation_probability=config_parser.getfloat("EA", "mutation_probability")
         )
 
-        solution = None
-        if problem == "DDAP":
-            solution = EA.ddap()
-        elif problem == "DAP":
-            solution = EA.dap()
-        else:
-            print(f"Incorrect problem: {problem}. Choose DAP or DDAP.")
+        solution = EA.compute()
 
     output_writer = OutputWriter(net=net)
     output_writer.save_solution(solution=solution, file_name=config_parser.get("general", "output_file"))

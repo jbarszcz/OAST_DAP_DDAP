@@ -2,7 +2,8 @@ from net.Demand import Demand
 from net.Link import Link
 import utils
 from typing import List
-from net.DemandPath import DemandPath
+from net.Route import Route
+
 
 class Net:
     def __init__(self):
@@ -15,6 +16,6 @@ class Net:
     def get_demand(self, demand_id) -> Demand:
         return self.demands[demand_id - 1]
 
-    def get_all_demand_paths(self) -> List[DemandPath]:
+    def get_all_demand_paths(self) -> List[Route]:
         demand_paths = [demand.demand_paths for demand in self.demands]
         return utils.join_lists(demand_paths)

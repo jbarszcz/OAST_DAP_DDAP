@@ -1,7 +1,7 @@
 from net.Net import Net
 from net.Link import Link
 from net.Demand import Demand
-from net.DemandPath import DemandPath
+from net.Route import Route
 
 
 class NetParser:
@@ -19,7 +19,7 @@ class NetParser:
             number_of_links = int(net_file.readline())
             for i in range(number_of_links):
                 link_data = self.parse_line(net_file.readline())
-                link = Link(data=link_data, link_id=i + 1)
+                link = Link(data=link_data)
                 net.links.append(link)
 
             net_file.readline()  # -1 line
@@ -36,7 +36,7 @@ class NetParser:
 
                 for demand_path_number in range(number_of_demand_paths):
                     demand_path_data = self.parse_line(net_file.readline())
-                    demand_path = DemandPath(data=demand_path_data, demand_id=demand_number + 1)
+                    demand_path = Route(data=demand_path_data, demand_id=demand_number + 1)
                     demand.demand_paths.append(demand_path)
 
                 net.demands.append(demand)
