@@ -1,6 +1,6 @@
 from net.Demand import Demand
 from net.Link import Link
-import utils
+import itertools
 from typing import List
 from net.Route import Route
 
@@ -18,4 +18,4 @@ class Net:
 
     def get_all_demand_paths(self) -> List[Route]:
         demand_paths = [demand.demand_paths for demand in self.demands]
-        return utils.join_lists(demand_paths)
+        return list(itertools.chain.from_iterable(demand_paths))
