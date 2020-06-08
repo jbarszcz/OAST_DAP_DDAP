@@ -10,7 +10,7 @@ def compute(net: Net, problem: str):
     solutions = get_all_solutions(demands)
     print("calculating link capacities...")
     for solution in solutions:
-        solution.calculate_links(net)
+        solution.calculate_links(net, problem=problem)
 
     if problem == "DDAP":
         print("solving ddap with bruteforce method...")

@@ -11,7 +11,9 @@ import time
 
 
 class EvolutionaryAlgorithm:
-    def __init__(self, seed: int,
+    def __init__(self,
+                 problem: str,
+                 seed: int,
                  net: Net,
                  number_of_chromosomes: int,
                  max_time: int,
@@ -41,6 +43,7 @@ class EvolutionaryAlgorithm:
         self.percent_of_best_chromosomes = percent_of_best_chromosomes
         self.number_of_best_chromosomes = round(number_of_chromosomes * percent_of_best_chromosomes)
         self.population_padding = number_of_chromosomes - self.number_of_best_chromosomes
+        self.problem = problem
 
     def ddap(self) -> Solution:
         population = self.get_initial_population()
@@ -82,7 +85,7 @@ class EvolutionaryAlgorithm:
                             self.mutations += 1
 
             for chromosome in population:
-                chromosome.calculate_links(self.net)
+                chromosome.calculate_links(self.net, problem="DDAP")
                 chromosome.calculate_ddap_cost(self.net)
 
             print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.cost}")
@@ -130,7 +133,7 @@ class EvolutionaryAlgorithm:
                             self.mutations += 1
 
             for chromosome in population:
-                chromosome.calculate_links(self.net)
+                chromosome.calculate_links(self.net, problem="DAP")
                 chromosome.calculate_dap_cost(self.net)
 
             print(f"Generation: {self.generation} cost: {best_chromosome_in_generation.maximum_link_overload}")
@@ -176,7 +179,7 @@ class EvolutionaryAlgorithm:
             for gene_combination in all_genes_combinations:
                 gene = random.choice(gene_combination).allocation_pattern
                 chromosome.add_gene(gene)
-            chromosome.calculate_links(self.net)
+            chromosome.calculate_links(self.net, problem=self.problem)
             chromosomes.append(chromosome)
 
         random.shuffle(chromosomes)

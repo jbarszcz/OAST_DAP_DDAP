@@ -27,6 +27,7 @@ if __name__ == "__main__":
     elif algorithm == "EA":
 
         EA = EvolutionaryAlgorithm(
+            problem=problem,
             net=net,
             seed=config_parser.getint("EA", "seed"),
             number_of_chromosomes=config_parser.getint("EA", "number_of_chromosomes"),

@@ -34,7 +34,7 @@ class Solution(object):
                 self.allocation_pattern[flows[0]] -= 1
                 self.allocation_pattern[flows[1]] += 1
 
-    def calculate_links(self, net: Net):
+    def calculate_links(self, net: Net, problem: str):
         links = net.links
         link_sizes = [0] * len(net.links)
         link_loads = [0] * len(net.links)
