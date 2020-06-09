@@ -41,4 +41,3 @@ class OutputWriter:
                 out_file.write(f"{solution}")
                 out_file.write("\n")
                 out_file.write("\n")
-        print(f"History saved to: {file_name}")

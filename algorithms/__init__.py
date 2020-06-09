@@ -7,7 +7,7 @@ from typing import List
 # zwraca wszystkie mozliwe kobinacje przeplywow dla danego zapotrzebowania
 def get_all_possible_chromosomes_with_one_gene(demand: Demand) -> List[Chromosome]:
     volume_split = range(demand.volume + 1)
-    volume_split_for_each_path = [volume_split for i in range(demand.get_number_of_paths())]
+    volume_split_for_each_path = [volume_split for _ in range(demand.get_number_of_paths())]
 
     volume_split_combinations = [combination for combination in product(*volume_split_for_each_path) if
                                  sum(combination) == demand.volume]

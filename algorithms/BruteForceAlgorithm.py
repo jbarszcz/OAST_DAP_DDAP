@@ -25,7 +25,7 @@ def compute(net: Net, problem: str) -> Chromosome:
             best_solution = solution
             print(f" {best_cost}", end="")
     print(f"\nSolution found in {round(time() - start_time, 2)} s.")
-
+    best_solution.calculate_links(net)
     return best_solution
 
 
